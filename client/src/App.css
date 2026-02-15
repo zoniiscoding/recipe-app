@@ -1,0 +1,84 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* 🍞 Toast Pop Animation */
+@keyframes toastPop {
+  0% { transform: translateY(40px) scale(0.9); opacity: 0; }
+  60% { transform: translateY(-10px) scale(1.03); }
+  100% { transform: translateY(0px) scale(1); opacity: 1; }
+}
+
+.animate-toastPop {
+  animation: toastPop 0.4s ease;
+}
+
+
+/* 🍓 Floating Strawberry Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-22px) rotate(2deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(-2deg);
+  }
+}
+
+@keyframes floatSlow {
+  0% {
+    transform: translateY(0px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(-2deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(1deg);
+  }
+}
+
+.animate-float {
+  animation: float 4.5s ease-in-out infinite;
+}
+
+.animate-floatSlow {
+  animation: floatSlow 7s ease-in-out infinite;
+}
