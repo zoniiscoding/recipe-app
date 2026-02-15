@@ -350,61 +350,120 @@ function App() {
       )}
 
       {/* Edit Modal */}
-      {editingRecipe && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-[28px] w-96 shadow-xl">
-            <h2 className="text-2xl font-semibold text-pink-500 mb-5">
-              Edit Recipe 🍓
-            </h2>
+{editingRecipe && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="bg-white p-8 rounded-[28px] w-96 shadow-xl">
 
-            <input
-              value={editingRecipe.title}
-              className="w-full border p-4 rounded-2xl mb-3"
-              onChange={(e) =>
-                setEditingRecipe({ ...editingRecipe, title: e.target.value })
-              }
-            />
+      <h2 className="text-2xl font-semibold text-pink-500 mb-6">
+        Edit Recipe 🍓
+      </h2>
 
-            <input
-              value={editingRecipe.ingredients}
-              className="w-full border p-4 rounded-2xl mb-3"
-              onChange={(e) =>
-                setEditingRecipe({ ...editingRecipe, ingredients: e.target.value })
-              }
-            />
+      {/* Title */}
+      <label className="text-sm text-gray-500">Title</label>
+      <input
+        value={editingRecipe.title}
+        className="w-full border p-4 rounded-2xl mb-4 mt-1"
+        onChange={(e) =>
+          setEditingRecipe({ ...editingRecipe, title: e.target.value })
+        }
+      />
 
-            <input
-              value={editingRecipe.cookingTime}
-              className="w-full border p-4 rounded-2xl mb-3"
-              onChange={(e) =>
-                setEditingRecipe({ ...editingRecipe, cookingTime: e.target.value })
-              }
-            />
+      {/* Ingredients */}
+      <label className="text-sm text-gray-500">
+        Ingredients (comma separated)
+      </label>
+      <input
+        value={editingRecipe.ingredients}
+        className="w-full border p-4 rounded-2xl mb-4 mt-1"
+        onChange={(e) =>
+          setEditingRecipe({
+            ...editingRecipe,
+            ingredients: e.target.value,
+          })
+        }
+      />
 
-            <input
-              value={editingRecipe.imageURL || ""}
-              className="w-full border p-4 rounded-2xl mb-3"
-              onChange={(e) =>
-                setEditingRecipe({ ...editingRecipe, imageURL: e.target.value })
-              }
-            />
+      {/* Cooking Time */}
+      <label className="text-sm text-gray-500">Cooking Time (mins)</label>
+      <input
+        value={editingRecipe.cookingTime}
+        className="w-full border p-4 rounded-2xl mb-4 mt-1"
+        onChange={(e) =>
+          setEditingRecipe({
+            ...editingRecipe,
+            cookingTime: e.target.value,
+          })
+        }
+      />
 
-            <button
-              onClick={saveEdit}
-              className="w-full bg-pink-500 text-white py-3 rounded-full hover:bg-pink-400 transition"
-            >
-              Save Changes
-            </button>
+      {/* Image URL */}
+      <label className="text-sm text-gray-500">Image URL</label>
+      <input
+        value={editingRecipe.imageURL || ""}
+        className="w-full border p-4 rounded-2xl mb-4 mt-1"
+        onChange={(e) =>
+          setEditingRecipe({
+            ...editingRecipe,
+            imageURL: e.target.value,
+          })
+        }
+      />
 
-            <button
-              onClick={() => setEditingRecipe(null)}
-              className="w-full mt-3 text-gray-500"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Difficulty Dropdown */}
+      <label className="text-sm text-gray-500">Difficulty</label>
+      <select
+        value={editingRecipe.difficulty || ""}
+        className="w-full border p-4 rounded-2xl mb-4 mt-1"
+        onChange={(e) =>
+          setEditingRecipe({
+            ...editingRecipe,
+            difficulty: e.target.value,
+          })
+        }
+      >
+        <option value="">Select Difficulty</option>
+        <option value="Easy">Easy</option>
+        <option value="Medium">Medium</option>
+        <option value="Hard">Hard</option>
+      </select>
+
+      {/* Category Dropdown */}
+      <label className="text-sm text-gray-500">Category</label>
+      <select
+        value={editingRecipe.category || ""}
+        className="w-full border p-4 rounded-2xl mb-6 mt-1"
+        onChange={(e) =>
+          setEditingRecipe({
+            ...editingRecipe,
+            category: e.target.value,
+          })
+        }
+      >
+        <option value="">Select Category</option>
+        {CATEGORY_OPTIONS.map((cat) => (
+          <option key={cat}>{cat}</option>
+        ))}
+      </select>
+
+      {/* Buttons */}
+      <button
+        onClick={saveEdit}
+        className="w-full bg-pink-500 text-white py-3 rounded-full hover:bg-pink-400 transition"
+      >
+        Save Changes
+      </button>
+
+      <button
+        onClick={() => setEditingRecipe(null)}
+        className="w-full mt-3 text-gray-500"
+      >
+        Cancel
+      </button>
+
+    </div>
+  </div>
+)}
+
 
       {/* Sparkle */}
       {showSparkle && (
