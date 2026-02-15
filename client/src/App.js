@@ -25,6 +25,8 @@ function App() {
   const [editingRecipe, setEditingRecipe] = useState(null);
   const [showSparkle, setShowSparkle] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [toast, setToast] = useState(null);
+
 
 
   const [newRecipe, setNewRecipe] = useState({
@@ -53,19 +55,36 @@ function App() {
   }, []);
 
   const filteredRecipes = recipes.filter((recipe) => {
-  const recipeTime = Number(recipe.cookingTime) || 0;
+  const recipeTime = Number(recipe.cookingTime);
+
+  const passesIngredient =
+    ingredientFilter === "" ||
+    recipe.ingredients?.some((i) =>
+      i.toLowerCase().includes(ingredientFilter.toLowerCase())
+    );
+
+  const passesDifficulty =
+    difficultyFilter === "" || recipe.difficulty === difficultyFilter;
+
+  const passesCategory =
+    categoryFilter === "" || recipe.category === categoryFilter;
+
+  const passesTime =
+    timeFilter === "" ||
+    (!isNaN(recipeTime) && recipeTime <= Number(timeFilter));
+
+  const passesFavorites =
+    !showFavoritesOnly || favorites.includes(recipe._id);
 
   return (
-    (ingredientFilter === "" ||
-      recipe.ingredients?.some((i) =>
-        i.toLowerCase().includes(ingredientFilter.toLowerCase())
-      )) &&
-    (difficultyFilter === "" || recipe.difficulty === difficultyFilter) &&
-    (categoryFilter === "" || recipe.category === categoryFilter) &&
-    (timeFilter === "" || recipeTime <= Number(timeFilter)) &&
-    (!showFavoritesOnly || favorites.includes(recipe._id))
+    passesIngredient &&
+    passesDifficulty &&
+    passesCategory &&
+    passesTime &&
+    passesFavorites
   );
 });
+
 
 
   const toggleFavorite = (id) => {
@@ -82,10 +101,24 @@ function App() {
   };
 
   const addRecipe = async () => {
+  try {
+    if (!newRecipe.title.trim()) {
+      showToast("Title is required.");
+      return;
+    }
+
+    if (!newRecipe.ingredients.trim()) {
+      showToast("Please enter at least one ingredient.");
+      return;
+    }
+
     await axios.post("http://localhost:5000/api/recipes", {
       ...newRecipe,
       cookingTime: Number(newRecipe.cookingTime),
-      ingredients: newRecipe.ingredients.split(",").map((i) => i.trim()),
+      ingredients: newRecipe.ingredients
+        .split(",")
+        .map((i) => i.trim())
+        .filter(Boolean),
     });
 
     setShowSparkle(true);
@@ -95,7 +128,16 @@ function App() {
       setShowForm(false);
       fetchRecipes();
     }, 900);
-  };
+
+    showToast("Recipe added successfully! 🍓", "success");
+
+  } catch (error) {
+    console.error(error);
+    showToast("Something went wrong while adding recipe.");
+  }
+};
+
+
 
   const startEdit = (recipe) => {
     setEditingRecipe({
@@ -106,6 +148,12 @@ function App() {
   };
 
   const saveEdit = async () => {
+  try {
+    if (!editingRecipe.title.trim()) {
+      showToast("Title cannot be empty.");
+      return;
+    }
+
     await axios.put(
       `http://localhost:5000/api/recipes/${editingRecipe._id}`,
       {
@@ -113,12 +161,31 @@ function App() {
         cookingTime: Number(editingRecipe.cookingTime),
         ingredients: editingRecipe.ingredients
           .split(",")
-          .map((i) => i.trim()),
+          .map((i) => i.trim())
+          .filter(Boolean),
       }
     );
+
     setEditingRecipe(null);
     fetchRecipes();
-  };
+
+    showToast("Recipe updated successfully! 🍓", "success");
+
+  } catch (error) {
+    console.error(error);
+    showToast("Something went wrong while saving changes.");
+  }
+};
+
+
+const showToast = (message, type = "error") => {
+  setToast({ message, type });
+
+  setTimeout(() => {
+    setToast(null);
+  }, 3000);
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-pink-100 p-6 relative overflow-hidden">
@@ -490,8 +557,26 @@ function App() {
           <div className="text-6xl animate-sparklePop">✨🍓✨</div>
         </div>
       )}
+
+      {/* Toast Notification */}
+{toast && (
+  <div className="fixed top-6 right-6 z-[200] animate-toastSlide">
+    <div
+      className={`px-6 py-4 rounded-2xl shadow-lg text-white transition ${
+        toast.type === "success"
+          ? "bg-green-500"
+          : "bg-pink-500"
+      }`}
+    >
+      {toast.message}
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
+
+
 
 export default App;
