@@ -8,6 +8,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
+
 
 
 const CATEGORY_OPTIONS = [
@@ -38,9 +40,12 @@ function App() {
 const [showAuth, setShowAuth] = useState(false);
 const [isLogin, setIsLogin] = useState(true);
 const [authForm, setAuthForm] = useState({
+  firstName: "",
+  lastName: "",
   email: "",
   password: "",
 });
+
 
 
 
@@ -240,7 +245,8 @@ const showToast = (message, type = "error") => {
   {user ? (
     <>
       <span className="text-sm text-gray-600">
-        {user.email}
+        {user.displayName || user.email}
+
       </span>
       <button
         onClick={() => signOut(auth)}
@@ -642,26 +648,49 @@ const showToast = (message, type = "error") => {
       <h2 className="text-2xl font-semibold text-pink-500 mb-6">
         {isLogin ? "Login 🍓" : "Sign Up 🍓"}
       </h2>
+{!isLogin && (
+  <>
+    <input
+      type="text"
+      placeholder="First Name"
+      className="w-full border p-4 rounded-2xl mb-4"
+      value={authForm.firstName}
+      onChange={(e) =>
+        setAuthForm({ ...authForm, firstName: e.target.value })
+      }
+    />
 
-      <input
-        type="email"
-        placeholder="Email"
-        className="w-full border p-4 rounded-2xl mb-4"
-        value={authForm.email}
-        onChange={(e) =>
-          setAuthForm({ ...authForm, email: e.target.value })
-        }
-      />
+    <input
+      type="text"
+      placeholder="Last Name"
+      className="w-full border p-4 rounded-2xl mb-4"
+      value={authForm.lastName}
+      onChange={(e) =>
+        setAuthForm({ ...authForm, lastName: e.target.value })
+      }
+    />
+  </>
+)}
 
-      <input
-        type="password"
-        placeholder="Password"
-        className="w-full border p-4 rounded-2xl mb-6"
-        value={authForm.password}
-        onChange={(e) =>
-          setAuthForm({ ...authForm, password: e.target.value })
-        }
-      />
+<input
+  type="email"
+  placeholder="Email"
+  className="w-full border p-4 rounded-2xl mb-4"
+  value={authForm.email}
+  onChange={(e) =>
+    setAuthForm({ ...authForm, email: e.target.value })
+  }
+/>
+
+<input
+  type="password"
+  placeholder="Password"
+  className="w-full border p-4 rounded-2xl mb-6"
+  value={authForm.password}
+  onChange={(e) =>
+    setAuthForm({ ...authForm, password: e.target.value })
+  }
+/>
 
       <button
         onClick={async () => {
@@ -673,11 +702,15 @@ const showToast = (message, type = "error") => {
                 authForm.password
               );
             } else {
-              await createUserWithEmailAndPassword(
-                auth,
-                authForm.email,
-                authForm.password
-              );
+              const userCredential = await createUserWithEmailAndPassword(
+  auth,
+  authForm.email,
+  authForm.password
+);
+
+await updateProfile(userCredential.user, {
+  displayName: `${authForm.firstName} ${authForm.lastName}`,
+});
             }
 
             setShowAuth(false);
