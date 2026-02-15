@@ -24,6 +24,8 @@ function App() {
   const [showForm, setShowForm] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState(null);
   const [showSparkle, setShowSparkle] = useState(false);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+
 
   const [newRecipe, setNewRecipe] = useState({
     title: "",
@@ -51,18 +53,20 @@ function App() {
   }, []);
 
   const filteredRecipes = recipes.filter((recipe) => {
-    const recipeTime = Number(recipe.cookingTime) || 0;
+  const recipeTime = Number(recipe.cookingTime) || 0;
 
-    return (
-      (ingredientFilter === "" ||
-        recipe.ingredients?.some((i) =>
-          i.toLowerCase().includes(ingredientFilter.toLowerCase())
-        )) &&
-      (difficultyFilter === "" || recipe.difficulty === difficultyFilter) &&
-      (categoryFilter === "" || recipe.category === categoryFilter) &&
-      (timeFilter === "" || recipeTime <= Number(timeFilter))
-    );
-  });
+  return (
+    (ingredientFilter === "" ||
+      recipe.ingredients?.some((i) =>
+        i.toLowerCase().includes(ingredientFilter.toLowerCase())
+      )) &&
+    (difficultyFilter === "" || recipe.difficulty === difficultyFilter) &&
+    (categoryFilter === "" || recipe.category === categoryFilter) &&
+    (timeFilter === "" || recipeTime <= Number(timeFilter)) &&
+    (!showFavoritesOnly || favorites.includes(recipe._id))
+  );
+});
+
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
@@ -139,6 +143,21 @@ function App() {
       </div>
 
       {/* Filters */}
+      <div className="flex items-center justify-between mb-6">
+  <button
+    onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+    className={`px-5 py-2 rounded-full transition ${
+      showFavoritesOnly
+        ? "bg-pink-500 text-white"
+        : "bg-gray-200 text-gray-700"
+    }`}
+  >
+    {showFavoritesOnly ? "Showing Favorites ❤️" : "Show Favorites 🤍"}
+  </button>
+
+  
+</div>
+
       <div className="max-w-6xl mx-auto bg-white rounded-[28px] shadow p-8 mb-12">
         <div className="grid md:grid-cols-4 gap-5">
           <input
