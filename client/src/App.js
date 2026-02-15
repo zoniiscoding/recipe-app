@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
+import { auth } from "./firebase";
+import {
+  onAuthStateChanged,
+  signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+
 
 const CATEGORY_OPTIONS = [
   "Breakfast",
@@ -26,6 +34,14 @@ function App() {
   const [showSparkle, setShowSparkle] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [toast, setToast] = useState(null);
+  const [user, setUser] = useState(null);
+const [showAuth, setShowAuth] = useState(false);
+const [isLogin, setIsLogin] = useState(true);
+const [authForm, setAuthForm] = useState({
+  email: "",
+  password: "",
+});
+
 
 
 
@@ -84,6 +100,14 @@ function App() {
     passesFavorites
   );
 });
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+  });
+
+  return () => unsubscribe();
+}, []);
+
 
 
 
@@ -191,6 +215,7 @@ const showToast = (message, type = "error") => {
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-pink-100 p-6 relative overflow-hidden">
 
       {/* Header */}
+      
       <div className="max-w-6xl mx-auto mb-12 flex justify-between items-center relative z-10">
         <div>
           <h1 className="text-5xl font-bold text-pink-500">
@@ -201,13 +226,49 @@ const showToast = (message, type = "error") => {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-pink-500 text-white px-8 py-4 rounded-full shadow-lg hover:bg-pink-400 hover:scale-105 transition"
-        >
-          + Add Recipe
-        </button>
+        <div className="flex items-center gap-4">
+
+  {user && (
+    <button
+      onClick={() => setShowForm(true)}
+      className="bg-pink-500 text-white px-8 py-4 rounded-full shadow-lg hover:bg-pink-400 hover:scale-105 transition"
+    >
+      + Add Recipe
+    </button>
+  )}
+
+  {user ? (
+    <>
+      <span className="text-sm text-gray-600">
+        {user.email}
+      </span>
+      <button
+        onClick={() => signOut(auth)}
+        className="bg-gray-200 px-5 py-2 rounded-full"
+      >
+        Logout
+      </button>
+    </>
+  ) : (
+    <button
+      onClick={() => setShowAuth(true)}
+      className="bg-pink-500 text-white px-6 py-3 rounded-full"
+    >
+      Login
+    </button>
+  )}
+
+</div>
+
       </div>
+      {/* Floating Strawberries */}
+<div className="pointer-events-none fixed inset-0 z-0 opacity-70">
+  <div className="absolute animate-floatSlow text-2xl" style={{top:"12%", left:"8%"}}>🍓</div>
+  <div className="absolute animate-float text-xl" style={{top:"28%", right:"12%"}}>🍓</div>
+  <div className="absolute animate-floatSlow text-xl" style={{bottom:"20%", left:"14%"}}>🍓</div>
+  <div className="absolute animate-float text-lg" style={{bottom:"10%", right:"18%"}}>🍓</div>
+</div>
+
 
       {/* Filters */}
       <div className="flex items-center justify-between mb-6">
@@ -572,6 +633,85 @@ const showToast = (message, type = "error") => {
     </div>
   </div>
 )}
+
+{/* Auth Modal */}
+{showAuth && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="bg-white p-8 rounded-[28px] w-96 shadow-xl relative">
+
+      <h2 className="text-2xl font-semibold text-pink-500 mb-6">
+        {isLogin ? "Login 🍓" : "Sign Up 🍓"}
+      </h2>
+
+      <input
+        type="email"
+        placeholder="Email"
+        className="w-full border p-4 rounded-2xl mb-4"
+        value={authForm.email}
+        onChange={(e) =>
+          setAuthForm({ ...authForm, email: e.target.value })
+        }
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        className="w-full border p-4 rounded-2xl mb-6"
+        value={authForm.password}
+        onChange={(e) =>
+          setAuthForm({ ...authForm, password: e.target.value })
+        }
+      />
+
+      <button
+        onClick={async () => {
+          try {
+            if (isLogin) {
+              await signInWithEmailAndPassword(
+                auth,
+                authForm.email,
+                authForm.password
+              );
+            } else {
+              await createUserWithEmailAndPassword(
+                auth,
+                authForm.email,
+                authForm.password
+              );
+            }
+
+            setShowAuth(false);
+            setAuthForm({ email: "", password: "" });
+
+          } catch (error) {
+            showToast(error.message);
+          }
+        }}
+        className="w-full bg-pink-500 text-white py-3 rounded-full hover:bg-pink-400 transition"
+      >
+        {isLogin ? "Login" : "Create Account"}
+      </button>
+
+      <p
+        className="text-sm text-center text-gray-500 mt-4 cursor-pointer"
+        onClick={() => setIsLogin(!isLogin)}
+      >
+        {isLogin
+          ? "Don't have an account? Sign up"
+          : "Already have an account? Login"}
+      </p>
+
+      <button
+        onClick={() => setShowAuth(false)}
+        className="absolute top-4 right-6 text-gray-400 text-xl"
+      >
+        ✕
+      </button>
+
+    </div>
+  </div>
+)}
+
 
     </div>
   );
