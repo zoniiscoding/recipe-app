@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* 🍞 Toast Pop Animation */
+@keyframes toastPop {
+  0% { transform: translateY(40px) scale(0.9); opacity: 0; }
+  60% { transform: translateY(-10px) scale(1.03); }
+  100% { transform: translateY(0px) scale(1); opacity: 1; }
+}
+
+.animate-toastPop {
+  animation: toastPop 0.4s ease;
+}
+
+
+/* 🍓 Floating Strawberry Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes floatSlow {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-floatSlow {
+  animation: floatSlow 9s ease-in-out infinite;
+}
+
+@keyframes toastSlide {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-toastSlide {
+  animation: toastSlide 0.35s ease-out;
+}
+
+@keyframes sparklePop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.animate-sparklePop {
+  animation: sparklePop 0.9s ease-out forwards;
+}
